@@ -1,0 +1,35 @@
+
+name: Keep EuropeConnect Services Active
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping EuropeConnect services
+        shell: bash
+        run: |
+          urls=(
+            "https://europeconnect-1.onrender.com/"
+            "https://api.europeconnect.org/"
+            "https://www.europeconnect.org/"
+            "https://europeconnect.onrender.com/"
+            "https://europeconnect.org/"
+          )
+
+          for url in "${urls[@]}"; do
+            echo "================================"
+            echo "Pinging: $url"
+
+            curl -sS -L \
+              --max-time 45 \
+              -o /dev/null \
+              -w "HTTP status: %{http_code}\n" \
+              "$url" || echo "Request failed: $url"
+          done
